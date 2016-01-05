@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Minesweeper</title>
+		<meta name="viewport" content="initial-scale=1">
+		<link rel="stylesheet" href="css/demo.css">
+	</head>
+	<body>
+		<input type="number" min="1" max="99" id="w" maxlength="2">&times;<input type="number" min="1" max="99" id="h" maxlength="2">
+		Flags: <output id="numFlagged">0</output>,
+		Mines: <output id="numMines"></output>
+		<ul id="field"></ul>
+
+		<script src="js/minesweeper.js"></script>
+		<script>
+	        // removes all of an element's childNodes
+			function removeChilds(el) {
+				var last;
+				while ((last = el.lastChild)) el.removeChild(last);
+			}
+
+            // gather elements
+			var field = document.getElementById('field');
+			var w = document.getElementById('w');
+			var h = document.getElementById('h');
+			var numMines = document.getElementById('numMines');
+			var ms;
+
+			// generate minesweeper
+			function start() {
+				// remove old minesweeper cells
+				removeChilds(field);
+
+				// generate
+				ms = new Minesweeper({
+					field: field
+					,width: w.value || 9
+					,height: h.value || 9
+					// ,numMines: 4
+				});
+				
+				// show number of mines
+				numMines.textContent = ms.numMines
+			}
+            start();
+
+			// set initial input values
+			w.value = ms.width;
+			h.value = ms.height;
+			
+			// regenerate minesweeper when inputs change
+			[w,h].forEach(function(input) {
+				input.addEventListener('input', start);
+			});
+		</script>
+	</body>
+</html>
