@@ -31,6 +31,11 @@ function Minesweeper(config) {
 		// (Math.sqrt(this.numCells) + 0.25 * this.numCells) / 2
 		0.15 * this.numCells
 	);
+
+	// for subscribable.js
+	this.subscribers = {};
+
+	// state variables
 	this.numFlagged = 0;
 	this.numRevealed = 0;
 
@@ -42,6 +47,7 @@ function Minesweeper(config) {
 	this.setupMines();
 
 	// render minefield
+	this.field.classList.remove('game-won', 'exploded');
 	this.field.style.width = 24 * this.width + 'px';
 	renderMultiple(this.cellObjs, function(cell) {
 		return cell.render();
@@ -54,6 +60,17 @@ function Minesweeper(config) {
 /*
 	Minesweeper methods
 */
+
+// Eventing with subscribable.js: https://github.com/Daniel-Hug/subscribable.js
+//
+// Subscribe to events with Minesweeper.prototype.on():
+//
+//  - .on('win', function(event){})
+//  - .on('explode', function(event, explodedCell){})
+//  - .on('flagToggle', function(event, cell){})
+//  - .on('cellReveal', function(event, cell){})
+Minesweeper.prototype = new Subscribable();
+
 
 Minesweeper.prototype.generateCells = function generateCells() {
 	for (var i = this.numCells; i--;) {
@@ -95,7 +112,8 @@ Minesweeper.prototype.setupNumbers = function setupNumbers(mines) {
 
 
 Minesweeper.prototype.win = function winGame(i) {
-	console.log('You win!');
+	this.field.classList.add('game-won');
+	this.trigger('win');
 };
 
 
@@ -127,10 +145,12 @@ Cell.prototype.render = function renderCell() {
 	var cell = this;
 	var li = document.createElement('li');
 
+	// 'mine' className
 	if (cell.isMine) {
 		li.classList.add('mine');
 	}
 
+	// data-num-adj attribute
 	if (!cell.isMine && cell.numAdjMines) {
 		li.dataset.numAdj = cell.numAdjMines;
 	}
@@ -166,7 +186,7 @@ Cell.prototype.toggleFlag = function toggleCellFlag(event) {
 	} else {
 		this.game.numFlagged--;
 	}
-	numFlagged.textContent = this.game.numFlagged;
+	this.game.trigger('flagToggle', this.game.numFlagged);
 };
 
 
@@ -177,7 +197,7 @@ Cell.prototype.reveal = function revealCell(event) {
 	this.isRevealed = true;
 	this.element.classList.add('revealed');
 	this.game.numRevealed++;
-	console.log(this.game.numRevealed);
+	this.game.trigger('cellReveal', this.game.numRevealed);
 
 	// You win when all non-mine cells are revealed
 	if (this.game.numRevealed === this.game.numCells - this.game.numMines) {
@@ -197,6 +217,7 @@ Cell.prototype.reveal = function revealCell(event) {
 
 Cell.prototype.explode = function explodeCell(event) {
 	this.game.field.classList.add('exploded');
+	this.game.trigger('explode', this);
 };
 
 

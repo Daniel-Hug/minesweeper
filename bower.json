@@ -1,0 +1,21 @@
+{
+  "name": "minesweeper",
+  "homepage": "https://github.com/Daniel-Hug/minesweeper",
+  "authors": [
+    "Daniel Hug <daniel@hugwebdesign.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "subscribable.js": "~2.0.1"
+  }
+}
