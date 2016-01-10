@@ -2,14 +2,27 @@ body {
 	background: #ddd;
 }
 
-#field {
+.ms .start {
+	display: none;
+}
+
+.ms.game-won .start,
+.ms.exploded .start {
+	display: initial;
+}
+
+.ms .field-wrapper {
+	position: relative;
+}
+
+.ms .cell-parent {
 	padding: 0;
 	list-style: none;
 	border: 2px inset #ccc;
 	overflow: hidden;
 }
 
-#field li {
+.ms li {
 	width: 24px;
 	height: 24px;
 	float: left;
@@ -21,25 +34,37 @@ body {
 	box-sizing: border-box;
 }
 
-#field .revealed {
+.ms .revealed {
 	border: 1px solid #ccc;
 	border-width: 1px 0 0 1px;
 }
 
-#field [data-num-adj].revealed:before {
+.ms [data-num-adj].revealed:before {
 	content: attr(data-num-adj);
 }
 
-#field .flagged:before {
+.ms .flagged:before {
 	content: 'P';
 }
 
-#field.exploded .mine:before {
+.ms.exploded .mine:not(.flagged):before {
 	content: '*';
 	line-height: 28px;
+	color: red;
 }
 
-#field.exploded li,
-#field .flag {
-	color: red;
+
+
+.ms .field-overlay {
+	display: none;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.ms.game-won .field-overlay,
+.ms.exploded .field-overlay {
+	display: block;
 }

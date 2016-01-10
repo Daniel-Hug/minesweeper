@@ -157,11 +157,6 @@ Cell.prototype.reveal = (function() {
 })();
 
 
-Cell.prototype.explode = function explodeCell() {
-	this.game.trigger('cellExplode', this);
-};
-
-
 // i is the index of a cell in a width*height grid
 // returns array containing the index of each adjacent cell in that grid
 Cell.prototype.getAdj = function getAdjCells() {

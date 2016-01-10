@@ -7,12 +7,18 @@
 		<link rel="stylesheet" href="css/demo.css">
 	</head>
 	<body>
-		<input type="number" min="1" max="99" id="w" maxlength="2" value="9"> &times;
-		<input type="number" min="1" max="99" id="h" maxlength="2" value="9">
-		<output id="numMines">12</output> Mines,
-		<output id="numFlagged">0</output> flags
+		<div class="ms">
+			<input type="number" min="1" max="99" class="w" maxlength="2" value="9"> &times;
+			<input type="number" min="1" max="99" class="h" maxlength="2" value="9">
+			<button class="start">restart</button>
+			<output class="numMines">12</output> Mines,
+			<output class="numFlagged">0</output> flags
 
-		<ul id="field"></ul>
+			<div class="field-wrapper">
+				<ul class="cell-parent"></ul>
+				<div class="field-overlay"></div>
+			</div>
+		</div>
 
 		<script src="bower_components/subscribable.js/subscribable.js"></script>
 		<script src="js/minesweeper.js"></script>

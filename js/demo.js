@@ -45,7 +45,7 @@ function renderCell(cell) {
 
 	// right click to toggle flag
 	li.addEventListener('contextmenu', function() {
-		if (!this.isRevealed) {
+		if (!cell.isRevealed) {
 			event.preventDefault();
 			cell.toggleFlag();
 		}
@@ -73,21 +73,24 @@ function generateMinesweeper(config) {
 	// setup game
 	var ms = new Minesweeper(config);
 
-	// setup game field element
-	ms.field = qs('#field');
-	ms.field.classList.remove('game-won', 'exploded');
-	ms.field.style.width = 24 * ms.width + 'px';
-	removeChilds(field);
+	// setup game container
+	var gameEl = qs('.ms');
+	gameEl.classList.remove('game-won', 'exploded');
 
-	// render cells and append to game field
-	renderMultiple(ms.cellObjs, renderCell, ms.field);
+	// setup cell container
+	var cellParent = qs('.cell-parent');
+	cellParent.style.width = 24 * ms.width + 'px';
+	removeChilds(cellParent);
+
+	// render and append cells
+	renderMultiple(ms.cellObjs, renderCell, cellParent);
 
 	// show number of mines
-	qs('#numMines').textContent = ms.numMines;
+	qs('.numMines').textContent = ms.numMines;
 
 	// keep flag count element updated
 	(function() {
-		var numFlagged = qs('#numFlagged');
+		var numFlagged = qs('.numFlagged');
 
 		ms.on('cellFlagToggle', function updateFlagCount() {
 			numFlagged.textContent = ms.numFlagged;
@@ -104,14 +107,21 @@ function generateMinesweeper(config) {
 		cell.element.classList.add('revealed');
 	});
 
-	// add 'exploded' class to game field
+	// add 'exploded' class to game container
 	ms.on('cellExplode', function(event, cell) {
-		this.field.classList.add('exploded');
+		gameEl.classList.add('exploded');
 	});
 
-	// add 'game-won' class to game field
+	// add 'game-won' class to game container
 	ms.on('win', function() {
-		this.field.classList.add('game-won');
+		gameEl.classList.add('game-won');
+
+		// flag all mines
+		ms.cellObjs.forEach(function(cell) {
+			if (cell.isMine) {
+				cell.element.classList.add('flagged');
+			}
+		})
 	});
 }
 
@@ -119,12 +129,14 @@ function generateMinesweeper(config) {
 
 
 /*
-	generate minesweeper now and again when width and height inputs change
+	generate minesweeper now,
+	when width and height inputs change,
+	and when 'start' is clicked
 */
 
 (function() {
-	var w = qs('#w');
-	var h = qs('#h');
+	var w = qs('.w');
+	var h = qs('.h');
 
 	function start() {
 		generateMinesweeper({
@@ -138,4 +150,6 @@ function generateMinesweeper(config) {
 	[w, h].forEach(function(input) {
 		input.addEventListener('input', start);
 	});
+
+	qs('.start').addEventListener('click', start);
 })();
