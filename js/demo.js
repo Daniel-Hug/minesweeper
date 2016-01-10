@@ -69,14 +69,9 @@ function renderCell(cell) {
 	generate minesweeper
 */
 
-function start() {
+function generateMinesweeper(config) {
 	// setup game
-	var ms = new Minesweeper({
-		width: w.value || 9,
-		height: h.value || 9,
-		cellRenderer: Cell.prototype.render
-		// numMines: 4
-	});
+	var ms = new Minesweeper(config);
 
 	// setup game field element
 	ms.field = qs('#field');
@@ -119,15 +114,28 @@ function start() {
 		this.field.classList.add('game-won');
 	});
 }
-start();
 
 
 
 
 /*
-	regenerate minesweeper when width and height inputs change
+	generate minesweeper now and again when width and height inputs change
 */
 
-[qs('#w'), qs('#h')].forEach(function(input) {
-	input.addEventListener('input', start);
-});
+(function() {
+	var w = qs('#w');
+	var h = qs('#h');
+
+	function start() {
+		generateMinesweeper({
+			width: w.value || 9,
+			height: h.value || 9
+			// numMines: 4
+		});
+	}
+
+	start();
+	[w, h].forEach(function(input) {
+		input.addEventListener('input', start);
+	});
+})();
