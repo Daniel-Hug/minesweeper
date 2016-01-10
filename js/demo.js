@@ -53,7 +53,7 @@ function renderCell(cell) {
 
 	// left click to reveal
 	li.addEventListener('click', function() {
-		if (cell.isRevealed) return;
+		if (cell.isRevealed || cell.isFlagged) return;
 		event.preventDefault();
 		cell.reveal();
 	}, false);
