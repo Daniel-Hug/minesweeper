@@ -97,22 +97,18 @@ function generateMinesweeper(config) {
 		}, true);
 	})();
 
-	// toggle 'flagged' class on cell
 	ms.on('cellFlagToggle', function(event, cell) {
 		cell.element.classList.toggle('flagged');
 	});
 
-	// add 'revealed' class to cell
 	ms.on('cellReveal', function(event, cell) {
 		cell.element.classList.add('revealed');
 	});
 
-	// add 'exploded' class to game container
 	ms.on('cellExplode', function(event, cell) {
 		gameEl.classList.add('exploded');
 	});
 
-	// add 'game-won' class to game container
 	ms.on('win', function() {
 		gameEl.classList.add('game-won');
 
