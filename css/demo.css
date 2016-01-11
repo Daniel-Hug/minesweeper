@@ -6,7 +6,7 @@ body {
 	display: none;
 }
 
-.ms.game-won .start,
+.ms.won .start,
 .ms.exploded .start {
 	display: initial;
 }
@@ -64,7 +64,7 @@ body {
 	right: 0;
 }
 
-.ms.game-won .field-overlay,
+.ms.won .field-overlay,
 .ms.exploded .field-overlay {
 	display: block;
 }

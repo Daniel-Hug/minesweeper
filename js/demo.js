@@ -23,6 +23,15 @@ function renderMultiple(arr, renderer, parent) {
 	parent.appendChild(docFrag);
 }
 
+//	Accepts a number, a singular noun, and a plural noun:
+//		pluralize(3, 'apple', 'apples')
+//	Returns the number paired with the correct noun:
+//		"3 apples"
+function pluralize(num, singular, plural) {
+	var noun = num === 1 ? singular : plural;
+	return num + ' ' + noun;
+}
+
 
 
 
@@ -75,7 +84,7 @@ function generateMinesweeper(config) {
 
 	// setup game container
 	var gameEl = qs('.ms');
-	gameEl.classList.remove('game-won', 'exploded');
+	gameEl.classList.remove('won', 'exploded');
 
 	// setup cell container
 	var cellParent = qs('.cell-parent');
@@ -86,14 +95,14 @@ function generateMinesweeper(config) {
 	renderMultiple(ms.cellObjs, renderCell, cellParent);
 
 	// show number of mines
-	qs('.numMines').textContent = ms.numMines;
+	qs('.numMines').textContent = pluralize(ms.numMines, 'mine', 'mines');
 
 	// keep flag count element updated
 	(function() {
 		var numFlagged = qs('.numFlagged');
 
 		ms.on('cellFlagToggle', function updateFlagCount() {
-			numFlagged.textContent = ms.numFlagged;
+			numFlagged.textContent = pluralize(ms.numFlagged, 'flag', 'flags');
 		}, true);
 	})();
 
@@ -110,7 +119,7 @@ function generateMinesweeper(config) {
 	});
 
 	ms.on('win', function() {
-		gameEl.classList.add('game-won');
+		gameEl.classList.add('won');
 
 		// flag all mines
 		ms.cellObjs.forEach(function(cell) {
