@@ -42,16 +42,6 @@ function pluralize(num, singular, plural) {
 function renderCell(cell) {
 	var li = document.createElement('li');
 
-	// 'mine' className
-	if (cell.isMine) {
-		li.classList.add('mine');
-	}
-
-	// data-num-adj attribute
-	if (!cell.isMine && cell.numAdjMines) {
-		li.dataset.numAdj = cell.numAdjMines;
-	}
-
 	// right click to toggle flag
 	li.addEventListener('contextmenu', function() {
 		if (!cell.isRevealed) {
@@ -64,6 +54,27 @@ function renderCell(cell) {
 	li.addEventListener('click', function() {
 		if (cell.isRevealed || cell.isFlagged) return;
 		event.preventDefault();
+
+		// if first click
+		if (cell.game.numRevealed === 0) {
+			// setup mines excluding this cell and adjacent cells
+			var safeCells = cell.getAdj().concat(cell);
+			console.log('safe: ', safeCells);
+			cell.game.setupMines(safeCells);
+
+			cell.game.cells.forEach(function(cell) {
+				// add 'mine' class to mine cell elements
+				if (cell.isMine) {
+					cell.element.classList.add('mine');
+				}
+
+				// data-num-adj attribute
+				if (!cell.isMine && cell.numAdjMines) {
+					cell.element.dataset.numAdj = cell.numAdjMines;
+				}
+			});
+		}
+
 		cell.reveal();
 	}, false);
 

@@ -24,7 +24,7 @@ function Minesweeper(config) {
 	this.generateCells();
 
 	// set mines randomly in cells
-	this.setupMines();
+	// this.setupMines();
 }
 
 
@@ -80,11 +80,20 @@ Minesweeper.prototype.setupMines = (function() {
 		}
 	}
 
-	return function setupMines() {
+	// return items from minuend that are not in subtrahend
+	function diffArrays(minuend, subtrahend) {
+		return minuend.filter(function(item) {
+			return subtrahend.indexOf(item) < 0;
+		});
+	}
+
+	return function setupMines(safeCells) {
 		var mines = [];
+		var unsafeCells = diffArrays(this.cells, safeCells);
+		console.log('unsafe: ', unsafeCells);
 
 		// loop through random cells up to this.numMines
-		loopRandom(this.cells, function(cell) {
+		loopRandom(unsafeCells, function(cell) {
 			// make it a mine
 			cell.isMine = true;
 
