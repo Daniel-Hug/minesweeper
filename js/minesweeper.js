@@ -57,19 +57,27 @@ Minesweeper.prototype.setupMines = (function() {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 
+	function randomI(collection) {
+		return randomInt(0, collection.length - 1);
+	}
+
 	return function setupMines() {
 		var nonMines = this.cells.slice(0);
 		var mines = [];
 
 		// place mines
 		for (var i = 0; i < this.numMines; i++) {
-			// place a mine randomly on a cell without a mine
-			var mineI = randomInt(0, this.numCells - 1 - i);
+			// pick a random cell in nonMines:
+			var mineI = randomI(nonMines);
+
+			// make it a mine
 			nonMines[mineI].isMine = true;
 
-			// update arrays: mines and nonMines
-			mines.push(nonMines[mineI]);
+			// remove new mine from nonMines
 			nonMines.splice(mineI, 1);
+
+			// add new mine to mines
+			mines.push(nonMines[mineI]);
 		}
 
 		// get indices of mines
