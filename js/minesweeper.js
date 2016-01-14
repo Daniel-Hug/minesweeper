@@ -53,32 +53,44 @@ Minesweeper.prototype.generateCells = function generateCells() {
 
 
 Minesweeper.prototype.setupMines = (function() {
-	function randomInt(min, max) {
+	function getRandomInt(min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 
-	function randomI(collection) {
-		return randomInt(0, collection.length - 1);
+	function getRandomI(collection) {
+		return getRandomInt(0, collection.length - 1);
+	}
+
+	// call fn up to cap or collection.length times
+	// pass a random unique item from collection each time
+	function loopRandom(collection, fn, cap) {
+		var untouched = collection.slice(0);
+		cap = typeof cap === 'number' ? cap : collection.length;
+
+		// loop through up to cap items
+		for (var i = 0; i < cap; i++) {
+			// pick a random index in untouched
+			var randomI = getRandomI(untouched);
+
+			// pass the item to fn
+			fn(untouched[randomI], collection);
+
+			// remove the item from untouched
+			untouched.splice(randomI, 1);
+		}
 	}
 
 	return function setupMines() {
-		var nonMines = this.cells.slice(0);
 		var mines = [];
 
-		// place mines
-		for (var i = 0; i < this.numMines; i++) {
-			// pick a random cell in nonMines:
-			var mineI = randomI(nonMines);
-
+		// loop through random cells up to this.numMines
+		loopRandom(this.cells, function(cell) {
 			// make it a mine
-			nonMines[mineI].isMine = true;
-
-			// remove new mine from nonMines
-			nonMines.splice(mineI, 1);
+			cell.isMine = true;
 
 			// add new mine to mines
-			mines.push(nonMines[mineI]);
-		}
+			mines.push(cell);
+		}, this.numMines);
 
 		// get indices of mines
 		this.setupNumbers(mines);
@@ -168,11 +180,10 @@ Cell.prototype.reveal = (function() {
 // i is the index of a cell in a width*height grid
 // returns array containing the index of each adjacent cell in that grid
 Cell.prototype.getAdj = function getAdjCells() {
-	var cell = this;
-	var game = cell.game;
+	var game = this.game;
 	var width = game.width;
 	var height = game.height;
-	var i = game.cells.indexOf(cell);
+	var i = game.cells.indexOf(this);
 
 	// x and y coordinates of cell in grid (starts at 0,0)
 	var xy = {
