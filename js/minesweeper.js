@@ -20,10 +20,10 @@ function Minesweeper(config) {
 	this.numRevealed = 0;
 
 	// generate a data object for each cell
-	this.cellObjs = [];
+	this.cells = [];
 	this.generateCells();
 
-	// set mines randomly in cellObjs
+	// set mines randomly in cells
 	this.setupMines();
 }
 
@@ -47,7 +47,7 @@ Minesweeper.prototype = new Subscribable();
 
 Minesweeper.prototype.generateCells = function generateCells() {
 	for (var i = this.numCells; i--;) {
-		this.cellObjs.push(new Cell(this));
+		this.cells.push(new Cell(this));
 	}
 };
 
@@ -58,7 +58,7 @@ Minesweeper.prototype.setupMines = (function() {
 	}
 
 	return function setupMines() {
-		var nonMines = this.cellObjs.slice(0);
+		var nonMines = this.cells.slice(0);
 		var mines = [];
 
 		// place mines
@@ -164,7 +164,7 @@ Cell.prototype.getAdj = function getAdjCells() {
 	var game = cell.game;
 	var width = game.width;
 	var height = game.height;
-	var i = game.cellObjs.indexOf(cell);
+	var i = game.cells.indexOf(cell);
 
 	// x and y coordinates of cell in grid (starts at 0,0)
 	var xy = {
@@ -191,6 +191,6 @@ Cell.prototype.getAdj = function getAdjCells() {
 	// return adjacent cells that exist in grid
 	return adjacentCells.filter(validXy).map(function(xy) {
 		var i = xy.y * width + xy.x;
-		return game.cellObjs[i];
+		return game.cells[i];
 	});
 };

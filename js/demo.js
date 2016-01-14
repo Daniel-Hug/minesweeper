@@ -92,7 +92,7 @@ function generateMinesweeper(config) {
 	removeChilds(cellParent);
 
 	// render and append cells
-	renderMultiple(ms.cellObjs, renderCell, cellParent);
+	renderMultiple(ms.cells, renderCell, cellParent);
 
 	// show number of mines
 	qs('.numMines').textContent = pluralize(ms.numMines, 'mine', 'mines');
@@ -122,7 +122,7 @@ function generateMinesweeper(config) {
 		gameEl.classList.add('won');
 
 		// flag all mines
-		ms.cellObjs.forEach(function(cell) {
+		ms.cells.forEach(function(cell) {
 			if (cell.isMine) {
 				cell.element.classList.add('flagged');
 			}
