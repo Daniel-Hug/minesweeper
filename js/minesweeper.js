@@ -1,9 +1,52 @@
-(function() {
+(function(global) {
+	function extend(destination, source) {
+		for (var key in source) {
+			if (source.hasOwnProperty(key)) {
+				destination[key] = source[key];
+			}
+		}
+		return destination;
+	}
+
+	function getRandomInt(min, max) {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+	function getRandomI(collection) {
+		return getRandomInt(0, collection.length - 1);
+	}
+
+	// call fn up to cap or collection.length times
+	// pass a random unique item from collection each time
+	function loopRandom(collection, fn, cap) {
+		var untouched = collection.slice(0);
+		cap = typeof cap === 'number' ? cap : collection.length;
+
+		// loop through up to cap items
+		for (var i = 0; i < cap; i++) {
+			// pick a random index in untouched
+			var randomI = getRandomI(untouched);
+
+			// pass the item to fn
+			fn(untouched[randomI], collection);
+
+			// remove the item from untouched
+			untouched.splice(randomI, 1);
+		}
+	}
+
+	// return items from minuend that are not in subtrahend
+	function diffArrays(minuend, subtrahend) {
+		return minuend.filter(function(item) {
+			return subtrahend.indexOf(item) < 0;
+		});
+	}
+
 	/*
 		Minesweeper constructor
 	*/
 
-	function Minesweeper(config) {
+	global.Minesweeper = function Minesweeper(config) {
 		// config
 		this.width = config.width || 9;
 		this.height = config.height || 9;
@@ -26,7 +69,7 @@
 
 		// set mines randomly in cells
 		// this.setupMines();
-	}
+	};
 
 
 
@@ -43,7 +86,10 @@
 	//  - .on('cellExplode', function(event, explodedCell){})
 	//  - .on('cellFlagToggle', function(event, cell){})
 	//  - .on('cellReveal', function(event, cell){})
-	Minesweeper.prototype = new Subscribable();
+	extend(Minesweeper.prototype, Subscribable.prototype);
+
+	// live DOM updates with Snoopy and DOM Builder
+	extend(Minesweeper.prototype, Snoopy.prototype);
 
 
 	Minesweeper.prototype.generateCells = function generateCells() {
@@ -53,59 +99,22 @@
 	};
 
 
-	Minesweeper.prototype.setupMines = (function() {
-		function getRandomInt(min, max) {
-			return Math.floor(Math.random() * (max - min + 1)) + min;
-		}
+	Minesweeper.prototype.setupMines = function setupMines(safeCells) {
+		var mines = [];
+		var unsafeCells = diffArrays(this.cells, safeCells);
 
-		function getRandomI(collection) {
-			return getRandomInt(0, collection.length - 1);
-		}
+		// loop through random cells up to this.numMines
+		loopRandom(unsafeCells, function(cell) {
+			// make it a mine
+			cell.isMine = true;
 
-		// call fn up to cap or collection.length times
-		// pass a random unique item from collection each time
-		function loopRandom(collection, fn, cap) {
-			var untouched = collection.slice(0);
-			cap = typeof cap === 'number' ? cap : collection.length;
+			// add new mine to mines
+			mines.push(cell);
+		}, this.numMines);
 
-			// loop through up to cap items
-			for (var i = 0; i < cap; i++) {
-				// pick a random index in untouched
-				var randomI = getRandomI(untouched);
-
-				// pass the item to fn
-				fn(untouched[randomI], collection);
-
-				// remove the item from untouched
-				untouched.splice(randomI, 1);
-			}
-		}
-
-		// return items from minuend that are not in subtrahend
-		function diffArrays(minuend, subtrahend) {
-			return minuend.filter(function(item) {
-				return subtrahend.indexOf(item) < 0;
-			});
-		}
-
-		return function setupMines(safeCells) {
-			var mines = [];
-			var unsafeCells = diffArrays(this.cells, safeCells);
-			console.log('unsafe: ', unsafeCells);
-
-			// loop through random cells up to this.numMines
-			loopRandom(unsafeCells, function(cell) {
-				// make it a mine
-				cell.isMine = true;
-
-				// add new mine to mines
-				mines.push(cell);
-			}, this.numMines);
-
-			// get indices of mines
-			this.setupNumbers(mines);
-		};
-	})();
+		// get indices of mines
+		this.setupNumbers(mines);
+	};
 
 
 	// increment cell.numAdjMines for each adjacent mine
@@ -126,14 +135,14 @@
 		Cell constructor
 	*/
 
-	function Cell(game) {
+	global.Cell = function Cell(game) {
 		if (!(this instanceof Cell)) return new Cell(game);
 		this.game = game;
 		this.isRevealed = false;
 		this.isMine = false;
 		this.isFlagged = false;
 		this.numAdjMines = 0;
-	}
+	};
 
 
 
@@ -141,6 +150,9 @@
 	/*
 		Cell methods
 	*/
+
+	// live DOM updates with Snoopy and DOM Builder
+	extend(Cell.prototype, Snoopy.prototype);
 
 	Cell.prototype.toggleFlag = function toggleCellFlag(event) {
 		this.isFlagged = !this.isFlagged;
@@ -223,4 +235,4 @@
 			return game.cells[i];
 		});
 	};
-})();
+})(this);

@@ -59,7 +59,6 @@ function renderCell(cell) {
 		if (cell.game.numRevealed === 0) {
 			// setup mines excluding this cell and adjacent cells
 			var safeCells = cell.getAdj().concat(cell);
-			console.log('safe: ', safeCells);
 			cell.game.setupMines(safeCells);
 
 			cell.game.cells.forEach(function(cell) {
