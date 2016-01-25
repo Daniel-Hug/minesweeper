@@ -16,7 +16,6 @@
     "tests"
   ],
   "dependencies": {
-    "subscribable.js": "2.x",
     "DOM-Builder": "1.x"
   }
 }

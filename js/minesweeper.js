@@ -59,9 +59,6 @@
 		this.numCells = this.width * this.height;
 		this.numMines = Math.floor(0.15 * this.numCells);
 
-		// for subscribable.js
-		this.subscribers = {};
-
 		// for Snoopy
 		this.snoopers = {};
 
@@ -88,16 +85,6 @@
 	/*
 		Minesweeper methods
 	*/
-
-	// Eventing with subscribable.js: https://github.com/Daniel-Hug/subscribable.js
-	//
-	// Subscribe to events with Minesweeper.prototype.on():
-	//
-	//  - .on('win', function(event){})
-	//  - .on('cellExplode', function(event, explodedCell){})
-	//  - .on('cellFlagToggle', function(event, cell){})
-	//  - .on('cellReveal', function(event, cell){})
-	extend(Minesweeper.prototype, Subscribable.prototype);
 
 	// live DOM updates with Snoopy and DOM Builder
 	extend(Minesweeper.prototype, Snoopy.prototype);
@@ -174,7 +161,6 @@
 		// update game.numFlagged
 		var game = this.game;
 		game.set('numFlagged', game.numFlagged + (this.isFlagged ? 1 : -1) );
-		game.trigger('cellFlagToggle', this);
 	};
 
 
@@ -193,12 +179,10 @@
 			var game = cell.game;
 			cell.set('isRevealed', true);
 			game.set('numRevealed', game.numRevealed + 1);
-			game.trigger('cellReveal', cell);
 
 			// You win when all non-mine cells are revealed
 			if (game.numRevealed === game.numCells - game.numMines) {
 				game.set('isWon', true);
-				game.trigger('win');
 			}
 
 			// if no adjacent mines
@@ -211,7 +195,6 @@
 
 		return function explodeOrRevealCell() {
 			if (this.isMine) {
-				this.game.trigger('cellExplode', this);
 				this.game.set('isLost', true);
 			} else {
 				revealCell(this);

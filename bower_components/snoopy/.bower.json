@@ -23,12 +23,12 @@
     "test",
     "tests"
   ],
-  "version": "0.1.0",
-  "_release": "0.1.0",
+  "version": "0.1.1",
+  "_release": "0.1.1",
   "_resolution": {
     "type": "version",
-    "tag": "0.1.0",
-    "commit": "1c785f70d07118c38529b23765bb607dcabc31c4"
+    "tag": "0.1.1",
+    "commit": "ae9b75dd7d4cda17cd768bdcc688ad0c473ac76b"
   },
   "_source": "git://github.com/Daniel-Hug/snoopy.git",
   "_target": "~0.1.0",
