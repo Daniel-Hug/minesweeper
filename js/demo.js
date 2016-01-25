@@ -40,42 +40,31 @@ function pluralize(num, singular, plural) {
 */
 
 function renderCell(cell) {
-	var li = document.createElement('li');
+	var li = dom({
+		el: 'li',
+		class_mine: cell.snoop('isMine'),
+		class_revealed: cell.snoop('isRevealed'),
+		class_flagged: cell.snoop('isFlagged'),
+		'data-num-adj': cell.snoop('numAdjMines', function(numAdjMines) {
+			return cell.isMine ? null : numAdjMines || null;
+		}),
 
-	// right click to toggle flag
-	li.addEventListener('contextmenu', function() {
-		if (!cell.isRevealed) {
-			event.preventDefault();
-			cell.toggleFlag();
+		// right click to toggle flag
+		on_contextmenu: function(event) {
+			if (!cell.isRevealed) {
+				event.preventDefault();
+				cell.toggleFlag();
+			}
+		},
+
+		// left click to reveal
+		on_click: function(event) {
+			if (!cell.isRevealed && !cell.isFlagged) {
+				event.preventDefault();
+				cell.reveal();
+			}
 		}
-	}, false);
-
-	// left click to reveal
-	li.addEventListener('click', function() {
-		if (cell.isRevealed || cell.isFlagged) return;
-		event.preventDefault();
-
-		// if first click
-		if (cell.game.numRevealed === 0) {
-			// setup mines excluding this cell and adjacent cells
-			var safeCells = cell.getAdj().concat(cell);
-			cell.game.setupMines(safeCells);
-
-			cell.game.cells.forEach(function(cell) {
-				// add 'mine' class to mine cell elements
-				if (cell.isMine) {
-					cell.element.classList.add('mine');
-				}
-
-				// data-num-adj attribute
-				if (!cell.isMine && cell.numAdjMines) {
-					cell.element.dataset.numAdj = cell.numAdjMines;
-				}
-			});
-		}
-
-		cell.reveal();
-	}, false);
+	});
 
 	cell.element = li;
 	return li;
@@ -94,7 +83,11 @@ function generateMinesweeper(config) {
 
 	// setup game container
 	var gameEl = qs('.ms');
-	gameEl.classList.remove('won', 'exploded');
+	dom({
+		el: gameEl,
+		class_won: ms.snoop('isWon'),
+		class_lost: ms.snoop('isLost')
+	});
 
 	// setup cell container
 	var cellParent = qs('.cell-parent');
@@ -105,33 +98,23 @@ function generateMinesweeper(config) {
 	renderMultiple(ms.cells, renderCell, cellParent);
 
 	// show number of mines
-	qs('.numMines').textContent = pluralize(ms.numMines, 'mine', 'mines');
+	dom({
+		el: qs('.numMines'),
+		text: ms.snoop('numMines', function(numMines) {
+			return pluralize(ms.numMines, 'mine', 'mines');
+		})
+	});
 
 	// keep flag count element updated
-	(function() {
-		var numFlagged = qs('.numFlagged');
-
-		ms.on('cellFlagToggle', function updateFlagCount() {
-			numFlagged.textContent = pluralize(ms.numFlagged, 'flag', 'flags');
-		}, true);
-	})();
-
-	ms.on('cellFlagToggle', function(event, cell) {
-		cell.element.classList.toggle('flagged');
+	dom({
+		el: qs('.numFlagged'),
+		text: ms.snoop('numFlagged', function(numFlagged) {
+			return pluralize(ms.numFlagged, 'flag', 'flags');
+		})
 	});
 
-	ms.on('cellReveal', function(event, cell) {
-		cell.element.classList.add('revealed');
-	});
-
-	ms.on('cellExplode', function(event, cell) {
-		gameEl.classList.add('exploded');
-	});
-
+	// flag all mines on win
 	ms.on('win', function() {
-		gameEl.classList.add('won');
-
-		// flag all mines
 		ms.cells.forEach(function(cell) {
 			if (cell.isMine) {
 				cell.element.classList.add('flagged');

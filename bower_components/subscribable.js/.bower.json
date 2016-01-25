@@ -33,6 +33,6 @@
     "commit": "cf695280e98c7d7d75ca7b9e69fb513d377583fe"
   },
   "_source": "git://github.com/Daniel-Hug/subscribable.js.git",
-  "_target": "2.1.x",
+  "_target": "2.x",
   "_originalSource": "subscribable.js"
 }

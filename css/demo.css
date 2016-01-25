@@ -7,7 +7,7 @@ body {
 }
 
 .ms.won .start,
-.ms.exploded .start {
+.ms.lost .start {
 	display: initial;
 }
 
@@ -47,7 +47,7 @@ body {
 	content: 'P';
 }
 
-.ms.exploded .mine:not(.flagged):before {
+.ms.lost .mine:not(.flagged):before {
 	content: '*';
 	line-height: 28px;
 	color: red;
@@ -65,6 +65,6 @@ body {
 }
 
 .ms.won .field-overlay,
-.ms.exploded .field-overlay {
+.ms.lost .field-overlay {
 	display: block;
 }

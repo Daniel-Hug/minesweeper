@@ -42,26 +42,37 @@
 		});
 	}
 
+
+
+
 	/*
 		Minesweeper constructor
 	*/
 
 	global.Minesweeper = function Minesweeper(config) {
-		// config
-		this.width = config.width || 9;
-		this.height = config.height || 9;
+		// config defaults
+		this.width = 9;
+		this.height = 9;
+		this.safeFirst = true;
+
+		// computed config
 		this.numCells = this.width * this.height;
-		this.numMines = config.numMines || Math.floor(
-			// (Math.sqrt(this.numCells) + 0.25 * this.numCells) / 2
-			0.15 * this.numCells
-		);
+		this.numMines = Math.floor(0.15 * this.numCells);
 
 		// for subscribable.js
 		this.subscribers = {};
 
+		// for Snoopy
+		this.snoopers = {};
+
 		// state variables
+		this.isWon = false;
+		this.isLost = false;
 		this.numFlagged = 0;
 		this.numRevealed = 0;
+
+		// config overrides
+		extend(this, config);
 
 		// generate a data object for each cell
 		this.cells = [];
@@ -106,7 +117,7 @@
 		// loop through random cells up to this.numMines
 		loopRandom(unsafeCells, function(cell) {
 			// make it a mine
-			cell.isMine = true;
+			cell.set('isMine', true);
 
 			// add new mine to mines
 			mines.push(cell);
@@ -120,7 +131,7 @@
 	// increment cell.numAdjMines for each adjacent mine
 	Minesweeper.prototype.setupNumbers = function setupNumbers(mines) {
 		function incrementNumAdj(cell) {
-			cell.numAdjMines++;
+			cell.set('numAdjMines', cell.numAdjMines + 1);
 		}
 
 		mines.forEach(function(mine) {
@@ -142,6 +153,9 @@
 		this.isMine = false;
 		this.isFlagged = false;
 		this.numAdjMines = 0;
+
+		// for Snoopy
+		this.snoopers = {};
 	};
 
 
@@ -154,31 +168,37 @@
 	// live DOM updates with Snoopy and DOM Builder
 	extend(Cell.prototype, Snoopy.prototype);
 
-	Cell.prototype.toggleFlag = function toggleCellFlag(event) {
-		this.isFlagged = !this.isFlagged;
+	Cell.prototype.toggleFlag = function toggleCellFlag() {
+		this.set('isFlagged', !this.isFlagged);
 
 		// update game.numFlagged
-		if (this.isFlagged) {
-			this.game.numFlagged++;
-		} else {
-			this.game.numFlagged--;
-		}
-		this.game.trigger('cellFlagToggle', this);
+		var game = this.game;
+		game.set('numFlagged', game.numFlagged + (this.isFlagged ? 1 : -1) );
+		game.trigger('cellFlagToggle', this);
 	};
 
 
 	Cell.prototype.reveal = (function() {
 		function revealCell(cell) {
-			if (cell.isRevealed) return;
-			
+			if (cell.isRevealed || cell.isFlagged) return;
+
+			// if this is the first to be revealed
+			if (cell.game.numRevealed === 0) {
+				// setup mines excluding this cell and adjacent cells
+				var safeCells = cell.getAdj().concat(cell);
+				cell.game.setupMines(safeCells);
+			}
+
 			// set revealed state
-			cell.isRevealed = true;
-			cell.game.numRevealed++;
-			cell.game.trigger('cellReveal', cell);
+			var game = cell.game;
+			cell.set('isRevealed', true);
+			game.set('numRevealed', game.numRevealed + 1);
+			game.trigger('cellReveal', cell);
 
 			// You win when all non-mine cells are revealed
-			if (cell.game.numRevealed === cell.game.numCells - cell.game.numMines) {
-				cell.game.trigger('win');
+			if (game.numRevealed === game.numCells - game.numMines) {
+				game.set('isWon', true);
+				game.trigger('win');
 			}
 
 			// if no adjacent mines
@@ -192,6 +212,7 @@
 		return function explodeOrRevealCell() {
 			if (this.isMine) {
 				this.game.trigger('cellExplode', this);
+				this.game.set('isLost', true);
 			} else {
 				revealCell(this);
 			}
