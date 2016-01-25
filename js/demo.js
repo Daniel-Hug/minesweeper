@@ -112,15 +112,6 @@ function generateMinesweeper(config) {
 			return pluralize(ms.numFlagged, 'flag', 'flags');
 		})
 	});
-
-	// flag all mines on win
-	ms.on('win', function() {
-		ms.cells.forEach(function(cell) {
-			if (cell.isMine) {
-				cell.element.classList.add('flagged');
-			}
-		})
-	});
 }
 
 
