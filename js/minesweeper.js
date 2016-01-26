@@ -53,7 +53,7 @@
 		// config defaults
 		this.width = 9;
 		this.height = 9;
-		this.safeFirst = true;
+		this.safeFirstClick = true;
 
 		// computed config
 		this.numCells = this.width * this.height;
@@ -76,7 +76,9 @@
 		this.generateCells();
 
 		// set mines randomly in cells
-		// this.setupMines();
+		if (!this.safeFirstClick) {
+			this.setupMines();
+		}
 	};
 
 
@@ -99,7 +101,7 @@
 
 	Minesweeper.prototype.setupMines = function setupMines(safeCells) {
 		var mines = [];
-		var unsafeCells = diffArrays(this.cells, safeCells);
+		var unsafeCells = safeCells ? diffArrays(this.cells, safeCells) : this.cells;
 
 		// loop through random cells up to this.numMines
 		loopRandom(unsafeCells, function(cell) {
@@ -167,16 +169,17 @@
 	Cell.prototype.reveal = (function() {
 		function revealCell(cell) {
 			if (cell.isRevealed || cell.isFlagged) return;
+			var game = cell.game;
 
-			// if this is the first to be revealed
-			if (cell.game.numRevealed === 0) {
+			// if first click
+			if (game.numRevealed === 0 && game.safeFirstClick) {
+
 				// setup mines excluding this cell and adjacent cells
 				var safeCells = cell.getAdj().concat(cell);
-				cell.game.setupMines(safeCells);
+				game.setupMines(safeCells);
 			}
 
 			// set revealed state
-			var game = cell.game;
 			cell.set('isRevealed', true);
 			game.set('numRevealed', game.numRevealed + 1);
 

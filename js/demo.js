@@ -82,9 +82,8 @@ function generateMinesweeper(config) {
 	var ms = new Minesweeper(config);
 
 	// setup game container
-	var gameEl = qs('.ms');
 	dom({
-		el: gameEl,
+		el: qs('.ms'),
 		class_won: ms.snoop('isWon'),
 		class_lost: ms.snoop('isLost')
 	});
@@ -101,7 +100,7 @@ function generateMinesweeper(config) {
 	dom({
 		el: qs('.numMines'),
 		text: ms.snoop('numMines', function(numMines) {
-			return pluralize(ms.numMines, 'mine', 'mines');
+			return pluralize(numMines, 'mine', 'mines');
 		})
 	});
 
@@ -109,7 +108,7 @@ function generateMinesweeper(config) {
 	dom({
 		el: qs('.numFlagged'),
 		text: ms.snoop('numFlagged', function(numFlagged) {
-			return pluralize(ms.numFlagged, 'flag', 'flags');
+			return pluralize(numFlagged, 'flag', 'flags');
 		})
 	});
 }
@@ -129,9 +128,10 @@ function generateMinesweeper(config) {
 
 	function start() {
 		generateMinesweeper({
+			// numMines: 4,
+			// safeFirstClick: true,
 			width: w.value || 9,
 			height: h.value || 9
-			// numMines: 4
 		});
 	}
 
