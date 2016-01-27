@@ -1,3 +1,7 @@
+
+
+
+
 /*
 	helpers
 */
@@ -74,12 +78,19 @@ function renderCell(cell) {
 
 
 /*
-	generate minesweeper
+	generate minesweeper now and 
+	when width and height inputs change
 */
 
-function generateMinesweeper(config) {
+var ms;
+function generateMinesweeper() {
 	// setup game
-	var ms = new Minesweeper(config);
+	ms = new Minesweeper({
+		// numMines: 4,
+		// safeFirstClick: true,
+		width: qs('.w').value || 9,
+		height: qs('.h').value || 9
+	});
 
 	// setup game container
 	dom({
@@ -113,32 +124,22 @@ function generateMinesweeper(config) {
 	});
 }
 
+generateMinesweeper();
+
+[qs('.w'), qs('.h')].forEach(function(input) {
+	input.addEventListener('input', generateMinesweeper);
+});
+
 
 
 
 /*
-	generate minesweeper now,
-	when width and height inputs change,
+	re-initialize minesweeper
 	and when 'start' is clicked
 */
 
-(function() {
-	var w = qs('.w');
-	var h = qs('.h');
+function restart() {
+	ms.init();
+}
 
-	function start() {
-		generateMinesweeper({
-			// numMines: 4,
-			// safeFirstClick: true,
-			width: w.value || 9,
-			height: h.value || 9
-		});
-	}
-
-	start();
-	[w, h].forEach(function(input) {
-		input.addEventListener('input', start);
-	});
-
-	qs('.start').addEventListener('click', start);
-})();
+qs('.start').addEventListener('click', restart);
