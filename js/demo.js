@@ -88,8 +88,8 @@ function generateMinesweeper() {
 	ms = new Minesweeper({
 		// numMines: 4,
 		// safeFirstClick: true,
-		width: qs('.w').value || 9,
-		height: qs('.h').value || 9
+		width: +qs('.w').value || 9,
+		height: +qs('.h').value || 9
 	});
 
 	// setup game container
@@ -122,6 +122,11 @@ function generateMinesweeper() {
 			return pluralize(numFlagged, 'flag', 'flags');
 		})
 	});
+
+	// re-initialize minesweeper when 'start' is clicked
+	qs('.start').addEventListener('click', function restart() {
+		ms.init();
+	});
 }
 
 generateMinesweeper();
@@ -129,17 +134,3 @@ generateMinesweeper();
 [qs('.w'), qs('.h')].forEach(function(input) {
 	input.addEventListener('input', generateMinesweeper);
 });
-
-
-
-
-/*
-	re-initialize minesweeper
-	and when 'start' is clicked
-*/
-
-function restart() {
-	ms.init();
-}
-
-qs('.start').addEventListener('click', restart);

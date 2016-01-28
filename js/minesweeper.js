@@ -63,15 +63,15 @@
 		this.height = 9;
 		this.safeFirstClick = true;
 
-		// computed config
-		this.numCells = this.width * this.height;
-		this.numMines = Math.floor(0.15 * this.numCells);
-
 		// for Snoopy
 		this.snoopers = {};
 
 		// config overrides
 		extend(this, config);
+
+		// computed config
+		this.numCells = this.width * this.height;
+		this.numMines = this.numMines || Math.floor(0.15 * this.numCells);
 
 		// fill this.cells with new Cell() objects
 		this.cells = [];
