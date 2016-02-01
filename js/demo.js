@@ -11,22 +11,6 @@ function qs(selector, scope) {
 	return (scope || document).querySelector(selector);
 }
 
-// removes all of an element's childNodes
-function removeChilds(el) {
-	var last;
-	while ((last = el.lastChild)) el.removeChild(last);
-}
-
-// renderer will be called for each item in arr, and should return a DOM node.
-// all DOM nodes returned will be appended to parent in batch
-function renderMultiple(arr, renderer, parent) {
-	var docFrag = document.createDocumentFragment();
-	[].map.call(arr, renderer).forEach(function(el) {
-		docFrag.appendChild(el);
-	});
-	parent.appendChild(docFrag);
-}
-
 //	Accepts a number, a singular noun, and a plural noun:
 //		pluralize(3, 'apple', 'apples')
 //	Returns the number paired with the correct noun:
@@ -78,59 +62,70 @@ function renderCell(cell) {
 
 
 /*
-	generate minesweeper now and 
-	when width and height inputs change
+	generate minesweeper
 */
 
-var ms;
-function generateMinesweeper() {
+var ms = (function() {
+	var w = qs('.w');
+	var h = qs('.h');
+
 	// setup game
-	ms = new Minesweeper({
+	var ms = new Minesweeper({
 		// numMines: 4,
 		// safeFirstClick: true,
-		width: +qs('.w').value || 9,
-		height: +qs('.h').value || 9
+		width: +w.value || 9,
+		height: +h.value || 9
 	});
 
-	// setup game container
-	dom({
-		el: qs('.ms'),
-		class_won: ms.snoop('isWon'),
-		class_lost: ms.snoop('isLost')
+	// update width and height when inputs change
+	w.addEventListener('input', function() {
+		ms.set('width', this.value);
 	});
 
-	// setup cell container
+	h.addEventListener('input', function() {
+		ms.set('height', this.value);
+	});
+
+	return ms;
+})();
+
+// setup game container
+dom({
+	el: qs('.ms'),
+	class_won: ms.snoop('isWon'),
+	class_lost: ms.snoop('isLost')
+});
+
+// setup cell container
+(function() {
 	var cellParent = qs('.cell-parent');
-	cellParent.style.width = 24 * ms.width + 'px';
-	removeChilds(cellParent);
 
-	// render and append cells
-	renderMultiple(ms.cells, renderCell, cellParent);
-
-	// show number of mines
-	dom({
-		el: qs('.numMines'),
-		text: ms.snoop('numMines', function(numMines) {
-			return pluralize(numMines, 'mine', 'mines');
-		})
+	// keep element width updated
+	ms.snoop('width', function(width) {
+		cellParent.style.width = 24 * width + 'px';
 	});
 
-	// keep flag count element updated
-	dom({
-		el: qs('.numFlagged'),
-		text: ms.snoop('numFlagged', function(numFlagged) {
-			return pluralize(numFlagged, 'flag', 'flags');
-		})
-	});
+	// render and append new cells when they're pushed to ms.cells
+	ms.cells.addDomObserver(cellParent, renderCell);
+})();
 
-	// re-initialize minesweeper when 'start' is clicked
-	qs('.start').addEventListener('click', function restart() {
-		ms.init();
-	});
-}
+// show number of mines
+dom({
+	el: qs('.numMines'),
+	text: ms.snoop('numMines', function(numMines) {
+		return pluralize(numMines, 'mine', 'mines');
+	})
+});
 
-generateMinesweeper();
+// keep flag count element updated
+dom({
+	el: qs('.numFlagged'),
+	text: ms.snoop('numFlagged', function(numFlagged) {
+		return pluralize(numFlagged, 'flag', 'flags');
+	})
+});
 
-[qs('.w'), qs('.h')].forEach(function(input) {
-	input.addEventListener('input', generateMinesweeper);
+// re-initialize minesweeper when 'start' is clicked
+qs('.start').addEventListener('click', function restart() {
+	ms.init();
 });

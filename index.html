@@ -8,8 +8,8 @@
 	</head>
 	<body>
 		<div class="ms">
-			<input type="number" min="1" max="99" class="w" value="9"> &times;
-			<input type="number" min="1" max="99" class="h" value="9">
+			<input type="number" min="1" max="99" maxlength="2" class="w" value="9"> &times;
+			<input type="number" min="1" max="99" maxlength="2" class="h" value="9">
 			<button class="start">restart</button>
 			<output class="numMines">12</output>,
 			<output class="numFlagged">0</output>
@@ -22,11 +22,20 @@
 
 
 		<!--
-			with Snoopy and DOM Builder we get
-			a subscribable model + live DOM updates
-			(minesweeper.js requires Snoopy, demo.js requires DOM Builder)
+			JS dependency tree:
+
+			demo.js
+			├─ minesweeper.js
+			|  ├─ snoopy
+			|  └─ observable-array/observable-array.js
+			|     └─ subscribable.js
+			├─ DOM-Builder
+			└─ observable-array/dom-observer.js
 		-->
 		<script src="bower_components/snoopy/snoopy.js"></script>
+		<script src="bower_components/subscribable.js/subscribable.js"></script>
+		<script src="bower_components/observable-array/observable-array.js"></script>
+		<script src="bower_components/observable-array/dom-observer.js"></script>
 		<script src="bower_components/DOM-Builder/dom.js"></script>
 
 		<!-- Minesweeper core logic -->

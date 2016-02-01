@@ -1,11 +1,11 @@
 {
-  "name": "minesweeper",
-  "homepage": "https://github.com/Daniel-Hug/minesweeper",
+  "name": "observable-array",
+  "main": "observable-array.js",
+  "homepage": "https://github.com/Daniel-Hug/observable-array",
   "authors": [
     "Daniel Hug <daniel@hugwebdesign.com>"
   ],
   "description": "",
-  "main": "",
   "moduleType": [],
   "license": "MIT",
   "ignore": [
@@ -16,7 +16,6 @@
     "tests"
   ],
   "dependencies": {
-    "DOM-Builder": "1.x",
-    "observable-array": "0.x"
+    "subscribable.js": "2.x"
   }
 }

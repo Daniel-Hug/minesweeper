@@ -50,6 +50,39 @@
 		});
 	}
 
+	// val can be a function that returns a value or a value
+	function fillArray(len, val) {
+		var arr = [], i;
+		if (typeof val === 'function') {
+			for (i = 0; i < len; i++) {
+				arr.push(val(i));
+			}
+		} else {
+			for (i = 0; i < len; i++) {
+				arr.push(val);
+			}
+		}
+		return arr;
+	}
+
+	// ensures the passed array is `len` long by appending new items or trimming extras
+	// `val` determines what will be pushed. It can be a function that returns a value or a value
+	function setLength(arr, len, val) {
+		var arr, i;
+		var lenDiff = len - arr.length;
+
+		// array needs to be longer
+		if (lenDiff > 0) {
+			var itemsToAdd = fillArray(lenDiff, val);
+			arr.push.apply(arr, itemsToAdd);
+		}
+
+		// array needs to be shorter
+		else if (lenDiff < 0) {
+			arr.splice(len);
+		}
+	}
+
 
 
 
@@ -69,18 +102,20 @@
 		// config overrides
 		extend(this, config);
 
-		// computed config
-		this.numCells = this.width * this.height;
-		this.numMines = this.numMines || Math.floor(0.15 * this.numCells);
+		this.cells = new ObservableArray();
+		this.snoop('width height', function(width, height) {
+			// computed config
+			this.set('numCells', width * height);
+			this.set('numMines', config.numMines || Math.floor(0.15 * this.numCells));
 
-		// fill this.cells with new Cell() objects
-		this.cells = [];
-		for (var i = this.numCells; i--;) {
-			this.cells.push(new Cell(this));
-		}
+			// fill this.cells with new Cell() objects
+			setLength(this.cells, this.numCells, (function() {
+				return new Cell(this);
+			}).bind(this));
 
-		// set initial game state and generate cells
-		this.init();
+			// set initial game state and generate cells
+			this.init();
+		});
 	};
 
 
